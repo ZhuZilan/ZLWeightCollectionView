@@ -8,19 +8,19 @@
 
 import UIKit
 
-let screenWidth: CGFloat = UIScreen.mainScreen().bounds.size.width
-let screenHeight: CGFloat = UIScreen.mainScreen().bounds.size.height
+let screenWidth: CGFloat = UIScreen.main.bounds.size.width
+let screenHeight: CGFloat = UIScreen.main.bounds.size.height
 
-func RGB(rgb: Int) -> UIColor {
+func RGB(_ rgb: Int) -> UIColor {
     return RGB(rgb, rgb, rgb)
 }
 
-func RGB(red: Int, _ green: Int, _ blue: Int, alpha: CGFloat = 1.0) -> UIColor {
+func RGB(_ red: Int, _ green: Int, _ blue: Int, alpha: CGFloat = 1.0) -> UIColor {
     return UIColor(red: CGFloat(red)/255.0, green: CGFloat(green)/255.0, blue: CGFloat(blue)/255.0, alpha: alpha)
 }
 
 extension Array {
-    func objectAtIndex(index: Int) -> Element? {
+    func objectAtIndex(_ index: Int) -> Element? {
         if 0 <= index && index < self.count {
             return self[index]
         } else {

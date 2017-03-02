@@ -15,9 +15,9 @@ class DataModel {
     
     // extra values for weighted display
     var weight: Int = 0
-    var colour: UIColor = UIColor.blackColor()
+    var colour: UIColor = UIColor.black
     var selected: Bool = false
     
     // pre-calculated size
-    var idealSize: CGSize = CGSizeZero
+    var idealSize: CGSize = CGSize.zero
 }

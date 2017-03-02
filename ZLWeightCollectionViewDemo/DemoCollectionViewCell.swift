@@ -16,8 +16,8 @@ class DemoCollectionViewCell: UICollectionViewCell {
     
 // MARK: - Control
     
-    private weak var contentLabel: UILabel!
-    private weak var selectionCover: UIView!
+    fileprivate weak var contentLabel: UILabel!
+    fileprivate weak var selectionCover: UIView!
     
 // MARK: - Init
     
@@ -37,9 +37,9 @@ class DemoCollectionViewCell: UICollectionViewCell {
             let label = UILabel()
             self.addSubview(label)
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.font = UIFont.systemFontOfSize(18)
+            label.font = UIFont.systemFont(ofSize: 18)
             label.textColor = RGB(0)
-            label.textAlignment = NSTextAlignment.Center
+            label.textAlignment = NSTextAlignment.center
             return label
         } ()
         
@@ -48,7 +48,7 @@ class DemoCollectionViewCell: UICollectionViewCell {
             self.addSubview(view)
             view.translatesAutoresizingMaskIntoConstraints = false
             view.backgroundColor = RGB(255, 255, 255, alpha: 0.5)
-            view.hidden = true
+            view.isHidden = true
             return view
         } ()
         
@@ -69,7 +69,7 @@ class DemoCollectionViewCell: UICollectionViewCell {
         
         var constraints: [NSLayoutConstraint] = []
         for vflformat in vflformats {
-            constraints += NSLayoutConstraint.constraintsWithVisualFormat(vflformat, options: [], metrics: nil, views: vflviews)
+            constraints += NSLayoutConstraint.constraints(withVisualFormat: vflformat, options: [], metrics: nil, views: vflviews)
         }
         
         self.addConstraints(constraints)
@@ -77,14 +77,14 @@ class DemoCollectionViewCell: UICollectionViewCell {
     
 // MARK: - Data Operation
     
-    func fillModel(model: DataModel?) {
+    func fillModel(_ model: DataModel?) {
         guard let model = model else {
             return
         }
         
         self.backgroundColor = model.colour
         self.contentLabel.text = "\(model.weight)"
-        self.selectionCover.hidden = !model.selected
+        self.selectionCover.isHidden = !model.selected
 //        self.contentLabel.textColor = model.selected ? RGB(128) : RGB(0)
     }
     

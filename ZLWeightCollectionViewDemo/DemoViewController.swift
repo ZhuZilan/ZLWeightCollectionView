@@ -16,10 +16,10 @@ class DemoViewController: UIViewController,
     
 // MARK: - Control
     
-    private weak var headerView: UIView!
-    private weak var headerLabel: UILabel!
-    private weak var reloadButton: UIButton!
-    private weak var demoCollectionView: UICollectionView!
+    fileprivate weak var headerView: UIView!
+    fileprivate weak var headerLabel: UILabel!
+    fileprivate weak var reloadButton: UIButton!
+    fileprivate weak var demoCollectionView: UICollectionView!
     
 // MARK: - Constant
     
@@ -32,7 +32,7 @@ class DemoViewController: UIViewController,
             }
             
             _groupVolumn = 0
-            for (i, split) in inGroupSplits.enumerate() {
+            for (i, split) in inGroupSplits.enumerated() {
                 if split <= 0 {
                     inGroupSplits[i] = 1
                 }
@@ -48,7 +48,7 @@ class DemoViewController: UIViewController,
         }
     }
     
-    private var _groupVolumn: Int = 1
+    fileprivate var _groupVolumn: Int = 1
     
 // MARK: - Data
     
@@ -60,7 +60,7 @@ class DemoViewController: UIViewController,
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        self.edgesForExtendedLayout = UIRectEdge.None
+        self.edgesForExtendedLayout = UIRectEdge()
         self.createViews()
         self.createConstraints()
         self.createInteractions()
@@ -83,20 +83,20 @@ class DemoViewController: UIViewController,
                 let label = UILabel()
                 view.addSubview(label)
                 label.translatesAutoresizingMaskIntoConstraints = false
-                label.font = UIFont.systemFontOfSize(20)
+                label.font = UIFont.systemFont(ofSize: 20)
                 label.text = "Weight Mechanism"
                 label.textColor = RGB(230)
-                label.textAlignment = NSTextAlignment.Center
+                label.textAlignment = NSTextAlignment.center
                 return label
             } ()
             
             reloadButton = {
-                let button = UIButton(type: UIButtonType.Custom)
+                let button = UIButton(type: UIButtonType.custom)
                 view.addSubview(button)
                 button.translatesAutoresizingMaskIntoConstraints = false
-                button.setTitle("Reload", forState: UIControlState.Normal)
-                button.setTitleColor(RGB(230), forState: UIControlState.Normal)
-                button.setTitleColor(RGB(127), forState: UIControlState.Highlighted)
+                button.setTitle("Reload", for: UIControlState())
+                button.setTitleColor(RGB(230), for: UIControlState())
+                button.setTitleColor(RGB(127), for: UIControlState.highlighted)
                 return button
             } ()
             
@@ -105,12 +105,12 @@ class DemoViewController: UIViewController,
         
         demoCollectionView = {
             let flowLayout = UICollectionViewFlowLayout()
-            flowLayout.scrollDirection = UICollectionViewScrollDirection.Vertical
-            let collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: flowLayout)
+            flowLayout.scrollDirection = UICollectionViewScrollDirection.vertical
+            let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
             self.view.addSubview(collectionView)
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.backgroundColor = RGB(25)
-            collectionView.registerClass(DemoCollectionViewCell.self, forCellWithReuseIdentifier: DemoCollectionViewCell.identifier)
+            collectionView.register(DemoCollectionViewCell.self, forCellWithReuseIdentifier: DemoCollectionViewCell.identifier)
             collectionView.dataSource = self
             collectionView.delegate = self
             return collectionView
@@ -119,7 +119,7 @@ class DemoViewController: UIViewController,
     
     /** Make constraints using visual format language. */
     func createConstraints() {
-        let vflmetrics: [String: AnyObject] = ["navSize": CGFloat(66)]
+        let vflmetrics: [String: AnyObject] = ["navSize": CGFloat(66) as AnyObject]
         let vflviews: [String: AnyObject] = [
             "headerView": headerView,
             "headerLabel": headerLabel,
@@ -137,39 +137,37 @@ class DemoViewController: UIViewController,
         
         var constraints: [NSLayoutConstraint] = []
         for vflformat in vflformats {
-            constraints += NSLayoutConstraint.constraintsWithVisualFormat(vflformat, options: [], metrics: vflmetrics, views: vflviews)
+            constraints += NSLayoutConstraint.constraints(withVisualFormat: vflformat, options: [], metrics: vflmetrics, views: vflviews)
         }
         
         self.view.addConstraints(constraints)
     }
     
     func createInteractions() {
-        self.reloadButton.addTarget(self, action: "reloadButtonDidClick:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.reloadButton.addTarget(self, action: #selector(DemoViewController.reloadButtonDidClick(_:)), for: UIControlEvents.touchUpInside)
     }
     
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return UIStatusBarStyle.LightContent
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return UIStatusBarStyle.lightContent
     }
     
 // MARK: - Interaction
     
-    func reloadButtonDidClick(sender: UIButton) {
+    func reloadButtonDidClick(_ sender: UIButton) {
         // here should lies a duplication checking mechanism
         // to avoid duplicate clicks.
         
         // simulate data and reload collection view.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0),
-            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {[weak self] () -> Void in
-                
+        DispatchQueue(label: "ZL.Util.GlobalQueueLabel").async { [weak self] in
+            
             // do data calculations in sub thread
             self?.simulateDataSource()
             self?.preCalculateCellSizeForDataSource()
-                
+            
             // and update ui in main thread
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0),
-                dispatch_get_main_queue(), { [weak self] () -> Void in
+            DispatchQueue.main.async { [weak self] in
                 self?.demoCollectionView.reloadData()
-            })
+            }
         }
     }
     
@@ -190,15 +188,15 @@ class DemoViewController: UIViewController,
     
     /** Pre calculate cell size for data source. */
     func preCalculateCellSizeForDataSource() {
-        for (i, model) in dataSource.enumerate() {
+        for (i, model) in dataSource.enumerated() {
             model.idealSize = cellSizeAtIndex(i)
         }
     }
     
     /** Calculate cell size at argument index. */
-    func cellSizeAtIndex(index: Int) -> CGSize {
+    func cellSizeAtIndex(_ index: Int) -> CGSize {
         guard let model = dataSource.objectAtIndex(index) else {
-            return CGSizeZero
+            return CGSize.zero
         }
         
         var cellWidth:          CGFloat = 0.0
@@ -225,56 +223,56 @@ class DemoViewController: UIViewController,
             }
         }
         
-        return CGSizeMake(cellWidth, screenHeight * 0.15)
+        return CGSize(width: cellWidth, height: screenHeight * 0.15)
     }
     
 // MARK: - Protocol - Collection View
     
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSource.count
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsetsMake(1, 1, 1, 1)
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 1
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 1
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return dataSource.objectAtIndex(indexPath.item)?.idealSize ?? CGSizeZero
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return dataSource.objectAtIndex(indexPath.item)?.idealSize ?? CGSize.zero
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(DemoCollectionViewCell.identifier, forIndexPath: indexPath)
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DemoCollectionViewCell.identifier, for: indexPath)
         return cell
     }
     
-    func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as? DemoCollectionViewCell)?.fillModel(dataSource.objectAtIndex(indexPath.item))
     }
     
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        collectionView.deselectItemAtIndexPath(indexPath, animated: true)
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
         
         var indexPaths = [indexPath]
         if 0 <= currentSelectedIndex && currentSelectedIndex < dataSource.count && currentSelectedIndex != indexPath.item {
-            indexPaths.append(NSIndexPath(forItem: currentSelectedIndex, inSection: 0))
+            indexPaths.append(IndexPath(item: currentSelectedIndex, section: 0))
             dataSource.objectAtIndex(currentSelectedIndex)?.selected = false
         }
         
         currentSelectedIndex = indexPath.item
         dataSource.objectAtIndex(indexPath.item)?.selected = !(dataSource.objectAtIndex(indexPath.item)?.selected ?? false)
-        collectionView.reloadItemsAtIndexPaths(indexPaths)
+        collectionView.reloadItems(at: indexPaths)
     }
     
 }
